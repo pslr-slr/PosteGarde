@@ -1,0 +1,1211 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+#pif-root {
+  --bg: #0f1319;
+  --surface: #1a212b;
+  --surface-2: #212a35;
+  --border: #2b3543;
+  --text: #edf1f6;
+  --text-muted: #8b96a5;
+  --amber: #ffb020;
+  --amber-dim: #4a3a1a;
+  --blue: #3ea6ff;
+  --blue-dim: #1b3350;
+  --green: #38d996;
+  --red: #ff5c5c;
+  --radius: 14px;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  transition: background .2s ease, color .2s ease;
+}
+/* High-brightness / high-contrast theme, for outdoor daylight use */
+#pif-root.theme-light {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-2: #f3f5f7;
+  --border: #c7cfd6;
+  --text: #11151b;
+  --text-muted: #545e69;
+  --amber: #b5680a;
+  --amber-dim: #fdecd2;
+  --blue: #0b5fcc;
+  --blue-dim: #dce9fb;
+  --green: #16824f;
+  --red: #c73333;
+}
+#pif-root * { box-sizing: border-box; }
+#pif-app {
+  width: 100%;
+  max-width: 460px;
+  min-height: 640px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ---- Responsive: tablette / PC ---- */
+@media (min-width: 720px) {
+  #pif-root { padding: 32px 16px; }
+  #pif-app { max-width: 480px; min-height: 700px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden; }
+  #pif-root.theme-light #pif-app { box-shadow: 0 20px 50px rgba(20,30,40,.12); }
+  #screen-admin, #screen-history, #screen-stats { max-width: none; }
+}
+@media (min-width: 960px) {
+  #pif-app.wide-screen { max-width: 880px; }
+  #pif-app.wide-screen #hist-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
+  .home-grid { flex-direction: row; }
+  .home-grid .tile { flex: 1; }
+}
+
+.contrast-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+.contrast-toggle:active { transform: scale(.94); }
+
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.display { font-family: 'Space Grotesk', sans-serif; }
+
+.screen { display: none; flex-direction: column; flex: 1; padding: 20px 18px 100px; animation: fadein .25s ease; }
+.screen.active { display: flex; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px);} to { opacity:1; transform:none;} }
+
+.topbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; min-height:36px; }
+.topbar .back { background:none; border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+.topbar .back:hover { background: var(--surface-2); }
+.topbar h1 { font-family:'Space Grotesk'; font-size:19px; font-weight:600; margin:0; flex:1; }
+.topbar .sub { font-size:12px; color:var(--text-muted); }
+
+.brand { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.brand-mark { width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg,var(--amber),#e08a00); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(255,176,32,.25); }
+.brand h2 { font-family:'Space Grotesk'; font-size:20px; margin:0; letter-spacing:.3px; }
+.brand p { margin:2px 0 0; font-size:12.5px; color:var(--text-muted); }
+
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:12.5px; color:var(--text-muted); margin-bottom:6px; letter-spacing:.2px; }
+.field input, .field select { width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); padding:13px 14px; border-radius:10px; font-size:15px; font-family:'Inter'; }
+.field input:focus, .field select:focus { outline:none; border-color:var(--amber); }
+
+.btn { display:flex; align-items:center; justify-content:center; gap:8px; border:none; border-radius:12px; padding:15px 18px; font-size:15px; font-weight:600; font-family:'Inter'; cursor:pointer; width:100%; transition:transform .1s ease, opacity .15s ease; }
+.btn:active { transform:scale(.98); }
+.btn:disabled { opacity:.4; cursor:not-allowed; }
+.btn-primary { background:var(--amber); color:#1a1206; }
+.btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+.btn-ghost { background:var(--surface); color:var(--text); }
+.btn-danger { background:transparent; color:var(--red); border:1px solid rgba(255,92,92,.35); }
+.btn-sm { padding:10px 14px; font-size:13.5px; width:auto; }
+
+.error-banner { background:rgba(255,92,92,.12); border:1px solid rgba(255,92,92,.35); color:#ffb3b3; padding:10px 13px; border-radius:10px; font-size:13px; margin-bottom:14px; }
+
+.tile { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px 18px; display:flex; flex-direction:column; align-items:flex-start; gap:10px; cursor:pointer; text-align:left; width:100%; }
+.tile:active { transform:scale(.985); }
+.tile-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; }
+.tile h3 { font-family:'Space Grotesk'; font-size:18px; margin:0; }
+.tile p { margin:0; font-size:12.5px; color:var(--text-muted); line-height:1.4; }
+
+.home-grid { display:flex; flex-direction:column; gap:14px; margin-top:6px; }
+.nav-row { display:flex; gap:10px; margin-top:22px; }
+.nav-row .btn { flex:1; }
+
+.progress { display:flex; gap:6px; margin-bottom:20px; }
+.progress i { flex:1; height:4px; border-radius:3px; background:var(--border); }
+.progress i.done { background:var(--amber); }
+
+.capture-box { border:1.5px dashed var(--border); border-radius:var(--radius); padding:22px; display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; background:var(--surface); }
+.capture-box img { width:100%; border-radius:10px; max-height:220px; object-fit:cover; }
+.capture-box .hint { font-size:12px; color:var(--text-muted); }
+
+.radio-group { display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+.radio-opt { display:flex; align-items:center; gap:12px; border:1px solid var(--border); background:var(--surface); padding:13px 14px; border-radius:10px; cursor:pointer; }
+.radio-opt.selected { border-color:var(--blue); background:var(--blue-dim); }
+.radio-opt .dot { width:18px; height:18px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; position:relative; }
+.radio-opt.selected .dot { border-color:var(--blue); }
+.radio-opt.selected .dot::after { content:''; position:absolute; inset:3px; border-radius:50%; background:var(--blue); }
+
+.check-list { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+.check-opt { display:flex; align-items:flex-start; gap:12px; border:1px solid var(--border); background:var(--surface); padding:13px 14px; border-radius:10px; cursor:pointer; }
+.check-opt.selected { border-color:var(--green); background:rgba(56,217,150,.08); }
+.check-opt .box { width:20px; height:20px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; }
+.check-opt.selected .box { border-color:var(--green); background:var(--green); }
+.check-opt span { font-size:14px; line-height:1.4; }
+.check-counter { font-size:12.5px; color:var(--text-muted); margin-bottom:16px; text-align:right; }
+.check-counter.ok { color:var(--green); }
+
+.plate-input { text-align:center; font-family:'IBM Plex Mono'; font-size:22px; letter-spacing:2px; text-transform:uppercase; }
+.ocr-status { font-size:12.5px; color:var(--amber); display:flex; align-items:center; gap:8px; margin:-4px 0 16px; }
+.spinner { width:14px; height:14px; border-radius:50%; border:2px solid var(--border); border-top-color:var(--amber); animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.recap-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); font-size:14px; }
+.recap-item:last-child { border-bottom:none; }
+.recap-item .k { color:var(--text-muted); }
+.recap-item .v { font-weight:600; text-align:right; }
+.recap-photos { display:flex; gap:8px; margin:14px 0; }
+.recap-photos img { width:100%; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--border); }
+
+.footer-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; padding:14px 18px calc(14px + env(safe-area-inset-bottom)); background:linear-gradient(0deg, var(--bg) 60%, transparent); display:flex; gap:10px; }
+
+.ticket { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:26px 20px; position:relative; overflow:hidden; text-align:center; margin-top:10px; }
+.ticket::before, .ticket::after { content:''; position:absolute; width:24px; height:24px; background:var(--bg); border-radius:50%; top:50%; transform:translateY(-50%); }
+.ticket::before { left:-12px; } .ticket::after { right:-12px; }
+.ticket .stamp { display:inline-block; border:2px solid var(--green); color:var(--green); font-family:'Space Grotesk'; font-weight:700; letter-spacing:2px; padding:6px 16px; border-radius:8px; transform:rotate(-4deg); margin-bottom:14px; font-size:13px; }
+.ticket h3 { font-family:'Space Grotesk'; font-size:20px; margin:0 0 4px; }
+.ticket .ts { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
+.ticket-divider { border-top:1.5px dashed var(--border); margin:16px 0; }
+
+.badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:4px 9px; border-radius:20px; font-weight:600; }
+.badge-blue { background:var(--blue-dim); color:var(--blue); }
+.badge-amber { background:var(--amber-dim); color:var(--amber); }
+
+.hist-item { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:10px; cursor:pointer; }
+.hist-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.hist-meta { font-size:12px; color:var(--text-muted); }
+.hist-detail { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:13px; }
+.hist-photos { display:flex; gap:8px; margin-top:10px; }
+.hist-photos img { width:70px; height:70px; object-fit:cover; border-radius:8px; }
+
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:14px; }
+.stat-row { display:flex; gap:14px; margin-bottom:14px; }
+.stat-num { flex:1; background:var(--surface-2); border-radius:12px; padding:14px; text-align:center; }
+.stat-num .n { font-family:'Space Grotesk'; font-size:26px; font-weight:700; }
+.stat-num .l { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+.guard-bar-row { margin-bottom:12px; }
+.guard-bar-label { display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px; }
+.guard-bar { height:10px; border-radius:6px; overflow:hidden; display:flex; background:var(--surface-2); }
+.guard-bar .seg-l { background:var(--blue); }
+.guard-bar .seg-p { background:var(--amber); }
+.trend-chart { display:flex; align-items:flex-end; gap:8px; height:110px; margin-top:6px; }
+.trend-bar { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
+.trend-bar .bar { width:100%; background:var(--amber); border-radius:4px 4px 0 0; min-height:3px; }
+.trend-bar .lab { font-size:10px; color:var(--text-muted); }
+
+.empty { text-align:center; padding:40px 10px; color:var(--text-muted); font-size:13.5px; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:11px 18px; border-radius:10px; font-size:13.5px; z-index:999; box-shadow:0 8px 24px rgba(0,0,0,.4); max-width:90%; }
+.toast.err { border-color:rgba(255,92,92,.4); color:#ffb3b3; }
+.notice { font-size:11.5px; color:var(--text-muted); line-height:1.5; margin-top:auto; padding-top:20px; text-align:center; }
+.link-btn { background:none; border:none; color:var(--text-muted); font-size:12.5px; text-decoration:underline; cursor:pointer; padding:0; }
+
+.tab-bar { display:flex; gap:8px; margin-bottom:18px; }
+.tab-btn { flex:1; padding:11px; border-radius:10px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:13.5px; font-weight:600; cursor:pointer; text-align:center; }
+.tab-btn.active { background:var(--amber-dim); color:var(--amber); border-color:var(--amber); }
+
+.agent-row { display:flex; align-items:center; justify-content:space-between; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:10px; gap:10px; }
+.agent-row .info { min-width:0; }
+.agent-row .name { font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.agent-row .pin { font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--text-muted); margin-top:2px; }
+.agent-row .actions { display:flex; gap:6px; flex-shrink:0; }
+.icon-btn { background:none; border:1px solid var(--border); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted); flex-shrink:0; }
+.icon-btn:hover { color:var(--text); border-color:var(--text-muted); }
+.icon-btn.danger:hover { color:var(--red); border-color:rgba(255,92,92,.4); }
+
+.admin-add-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:18px; }
+.admin-add-card .row { display:flex; gap:8px; }
+.admin-add-card .row .field { flex:1; margin-bottom:10px; }
+.section-label { font-size:12.5px; color:var(--text-muted); margin:2px 0 12px; text-transform:uppercase; letter-spacing:.5px; }
+.export-btns { display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+</style>
+
+<div id="pif-root">
+<div id="pif-app">
+
+  <button class="contrast-toggle" id="contrast-toggle" title="Basculer le contraste (luminosité)" onclick="pifApp.toggleContrast()">
+    <svg id="contrast-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+
+
+  <div class="toast-slot"></div>
+
+  <!-- LOGIN -->
+  <div class="screen active" id="screen-login">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div class="brand" style="margin-bottom:28px;">
+        <div class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a1206" stroke-width="2.2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div>
+          <h2>Poste de contrôle</h2>
+          <p>Livraisons &amp; points d'inspection filtrage</p>
+        </div>
+      </div>
+      <div id="login-error"></div>
+      <div class="field">
+        <label>Nom du gardien</label>
+        <input id="login-name" type="text" placeholder="ex. J. Martin" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Code PIN (4 chiffres)</label>
+        <input id="login-pin" type="tel" maxlength="4" placeholder="••••">
+      </div>
+      <button class="btn btn-primary" id="btn-login">Se connecter</button>
+      <button class="link-btn" style="margin-top:18px; align-self:center; display:block; text-align:center; width:100%;" onclick="pifApp.showAdminLogin()">Accès administration</button>
+      <p class="notice">Premier accès avec ce nom : le code saisi crée automatiquement votre compte. Les données (photos, horodatages) sont partagées entre tous les gardiens de ce poste à des fins de suivi et de statistiques.</p>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen" id="screen-home">
+    <div class="topbar">
+      <div style="flex:1;">
+        <div class="sub">Connecté en tant que</div>
+        <h1 id="home-guard-name">—</h1>
+      </div>
+      <button class="back" id="btn-logout" title="Déconnexion">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+
+    <div class="home-grid">
+      <button class="tile" onclick="pifApp.startLivraison()">
+        <div class="tile-icon" style="background:var(--blue-dim);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="1" y="7" width="15" height="11" rx="1.5"/><path d="M16 10h3.5L22 13.5V18h-6"/><circle cx="6" cy="19.5" r="1.6"/><circle cx="18" cy="19.5" r="1.6"/></svg>
+        </div>
+        <h3>Livraison</h3>
+        <p>Bon de livraison, d'enlèvement ou de mission — pièce d'identité et lieu.</p>
+      </button>
+
+      <button class="tile" onclick="pifApp.startPIF()">
+        <div class="tile-icon" style="background:var(--amber-dim);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3>PIF — Point d'inspection filtrage</h3>
+        <p>Plaque d'immatriculation, points de contrôle et badge / pièce d'identité.</p>
+      </button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-outline" onclick="pifApp.openHistory()">Historique</button>
+      <button class="btn btn-outline" onclick="pifApp.openStats()">Statistiques</button>
+    </div>
+  </div>
+
+  <!-- LIVRAISON WIZARD -->
+  <div class="screen" id="screen-livraison">
+    <div class="topbar">
+      <button class="back" onclick="pifApp.goHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h1>Livraison</h1><div class="sub" id="liv-step-label">Étape 1 sur 4</div></div>
+    </div>
+    <div class="progress" id="liv-progress"></div>
+    <div id="liv-body" style="flex:1;"></div>
+  </div>
+
+  <!-- PIF WIZARD -->
+  <div class="screen" id="screen-pif">
+    <div class="topbar">
+      <button class="back" onclick="pifApp.goHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div><h1>PIF</h1><div class="sub" id="pif-step-label">Étape 1 sur 4</div></div>
+    </div>
+    <div class="progress" id="pif-progress"></div>
+    <div id="pif-body" style="flex:1;"></div>
+  </div>
+
+  <!-- CONFIRMATION -->
+  <div class="screen" id="screen-confirm">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div class="ticket" id="confirm-ticket"></div>
+      <button class="btn btn-primary" style="margin-top:24px;" onclick="pifApp.goHome()">Retour à l'accueil</button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="screen" id="screen-history">
+    <div class="topbar">
+      <button class="back" onclick="pifApp.goHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <h1>Historique</h1>
+    </div>
+    <div class="field">
+      <select id="hist-filter" onchange="pifApp.renderHistory()">
+        <option value="today">Aujourd'hui</option>
+        <option value="7d">7 derniers jours</option>
+        <option value="all">Tout l'historique</option>
+      </select>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="screen" id="screen-stats">
+    <div class="topbar">
+      <button class="back" onclick="pifApp.goHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <h1>Statistiques</h1>
+    </div>
+    <div id="stats-body"></div>
+  </div>
+
+  <!-- ADMIN LOGIN -->
+  <div class="screen" id="screen-admin-login">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <div class="brand" style="margin-bottom:24px;">
+        <div class="brand-mark" style="background:linear-gradient(135deg,#6b7684,#333d47); box-shadow:0 4px 14px rgba(0,0,0,.3);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+        </div>
+        <div>
+          <h2>Administration</h2>
+          <p>Gestion des agents &amp; export des données</p>
+        </div>
+      </div>
+      <div id="admin-login-error"></div>
+      <div class="field">
+        <label>Code administrateur</label>
+        <input id="admin-pin-input" type="password" placeholder="••••••" autocomplete="off">
+      </div>
+      <button class="btn btn-primary" id="btn-admin-login">Accéder</button>
+      <button class="link-btn" style="margin-top:16px; align-self:center; display:block; text-align:center; width:100%;" onclick="pifApp.backToLoginFromAdmin()">Retour à la connexion gardien</button>
+      <p class="notice">Premier accès : le code saisi définit le code administrateur de ce poste.</p>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD -->
+  <div class="screen" id="screen-admin">
+    <div class="topbar">
+      <button class="back" onclick="pifApp.adminLogout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <h1>Administration</h1>
+    </div>
+    <div class="tab-bar">
+      <div class="tab-btn active" id="tab-agents" onclick="pifApp.switchAdminTab('agents')">Agents</div>
+      <div class="tab-btn" id="tab-export" onclick="pifApp.switchAdminTab('export')">Export des données</div>
+    </div>
+    <div id="admin-body" style="flex:1;"></div>
+  </div>
+
+</div>
+</div>
+
+<input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+
+<script>
+  // Backend: PHP + MySQL, via api.php (same folder). Every key used by the app
+  // (guards-list, admin-pin, events-index, event:<id>) is one row in the kv_store table.
+  const PIF_API_URL = 'api.php';
+
+  window.__pifDb = {
+    async get(key){
+      const res = await fetch(PIF_API_URL + '?key=' + encodeURIComponent(key), { method: 'GET' });
+      if (!res.ok) throw new Error('GET ' + res.status);
+      const data = await res.json();
+      return data.value;
+    },
+    async set(key, value){
+      const res = await fetch(PIF_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value })
+      });
+      if (!res.ok) throw new Error('POST ' + res.status);
+      return true;
+    }
+  };
+</script>
+<script>
+
+(function(){
+
+const CONTROL_POINTS = [
+  "Vérification de l'identité du conducteur / passager",
+  "Vérification du badge ou de l'autorisation d'accès",
+  "Contrôle visuel du véhicule (dommages, anomalies)",
+  "Contrôle du chargement / coffre",
+  "Concordance avec la liste des autorisations du jour"
+];
+
+let currentGuard = null;
+let liv = null, pif = null;
+let captureTarget = null;
+let historyDetailCache = {};
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function toast(msg, isErr){
+  const el = document.createElement('div');
+  el.className = 'toast' + (isErr ? ' err' : '');
+  el.textContent = msg;
+  document.querySelector('.toast-slot').appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+const WIDE_SCREENS = ['screen-admin', 'screen-history', 'screen-stats'];
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+  $('pif-app').classList.toggle('wide-screen', WIDE_SCREENS.includes(id));
+}
+
+// ---------- storage helpers (Firestore backend) ----------
+function waitForDb(){
+  return new Promise(resolve => {
+    if (window.__pifDb) return resolve();
+    const iv = setInterval(() => { if (window.__pifDb){ clearInterval(iv); resolve(); } }, 60);
+  });
+}
+async function sGet(key, shared){
+  await waitForDb();
+  try { return await window.__pifDb.get(key); }
+  catch(e){ console.error('Firestore get failed', e); toast('Erreur de connexion aux données.', true); return null; }
+}
+async function sSet(key, value, shared){
+  await waitForDb();
+  try { await window.__pifDb.set(key, value); return true; }
+  catch(e){ console.error('Firestore set failed', e); toast('Erreur d\'enregistrement des données.', true); return null; }
+}
+
+// ---------- login ----------
+async function doLogin(){
+  const name = $('login-name').value.trim();
+  const pin = $('login-pin').value.trim();
+  $('login-error').innerHTML = '';
+  if (!name){ $('login-error').innerHTML = '<div class="error-banner">Merci d\'indiquer votre nom.</div>'; return; }
+  if (!/^\d{4}$/.test(pin)){ $('login-error').innerHTML = '<div class="error-banner">Le code PIN doit contenir 4 chiffres.</div>'; return; }
+
+  const btn = $('btn-login');
+  btn.disabled = true; btn.textContent = 'Connexion...';
+  try {
+    const raw = await sGet('guards-list', true);
+    let guards = raw ? JSON.parse(raw) : [];
+    const key = name.toLowerCase();
+    let g = guards.find(x => x.key === key);
+    if (g){
+      if (g.pin !== pin){
+        $('login-error').innerHTML = '<div class="error-banner">Code PIN incorrect pour ce nom.</div>';
+        btn.disabled = false; btn.textContent = 'Se connecter';
+        return;
+      }
+    } else {
+      g = { key, name, pin };
+      guards.push(g);
+      await sSet('guards-list', JSON.stringify(guards), true);
+      toast('Compte créé pour ' + name);
+    }
+    currentGuard = g.name;
+    $('home-guard-name').textContent = currentGuard;
+    showScreen('screen-home');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Se connecter';
+  }
+}
+
+function goHome(){ showScreen('screen-home'); }
+function logout(){ currentGuard = null; $('login-name').value=''; $('login-pin').value=''; showScreen('screen-login'); }
+
+// ---------- image capture ----------
+function openCamera(target){
+  captureTarget = target;
+  $('camera-input').value = '';
+  $('camera-input').click();
+}
+
+function compressFile(file, maxDim, quality){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height && width > maxDim){ height = height * maxDim / width; width = maxDim; }
+      else if (height > maxDim){ width = width * maxDim / height; height = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+$('camera-input').addEventListener('change', async function(e){
+  const file = e.target.files[0];
+  if (!file || !captureTarget) return;
+  try {
+    const highRes = captureTarget === 'pif-plate';
+    const dataUrl = await compressFile(file, highRes ? 1100 : 850, highRes ? 0.82 : 0.62);
+    handleCapture(captureTarget, dataUrl);
+  } catch(err){
+    toast('Impossible de traiter la photo.', true);
+  }
+});
+
+function handleCapture(target, dataUrl){
+  if (target.startsWith('liv-')){
+    liv.photos[target] = dataUrl;
+    renderLivStep();
+  } else if (target.startsWith('pif-')){
+    if (target === 'pif-plate'){
+      pif.platePhoto = dataUrl;
+      renderPifStep();
+      runOCR(dataUrl);
+    } else {
+      pif.idPhoto = dataUrl;
+      renderPifStep();
+    }
+  }
+}
+
+async function runOCR(dataUrl){
+  pif.ocrRunning = true;
+  renderPifStep();
+  try {
+    const result = await Tesseract.recognize(dataUrl, 'eng');
+    let text = (result && result.data && result.data.text) || '';
+    let cleaned = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let formatted = cleaned;
+    const m = cleaned.match(/([A-Z]{2})(\d{3})([A-Z]{2})/);
+    if (m){ formatted = m[1] + '-' + m[2] + '-' + m[3]; }
+    pif.plate = formatted;
+  } catch(err){
+    toast('OCR indisponible, saisissez la plaque manuellement.', true);
+  } finally {
+    pif.ocrRunning = false;
+    renderPifStep();
+  }
+}
+
+// ---------- LIVRAISON wizard ----------
+const LIV_DOC_LABELS = { bon_livraison: 'Bon de livraison', bon_enlevement: "Bon d'enlèvement", ordre_mission: 'Ordre de mission' };
+
+function startLivraison(){
+  liv = { step: 1, docType: null, photos: {} };
+  showScreen('screen-livraison');
+  renderLivStep();
+}
+
+function renderLivProgress(total){
+  const el = $('liv-progress'); el.innerHTML = '';
+  for (let i=1;i<=total;i++){
+    const d = document.createElement('i');
+    if (i <= liv.step) d.classList.add('done');
+    el.appendChild(d);
+  }
+  $('liv-step-label').textContent = 'Étape ' + liv.step + ' sur ' + total;
+}
+
+function renderLivStep(){
+  const total = 4;
+  renderLivProgress(total);
+  const body = $('liv-body');
+  let html = '';
+
+  if (liv.step === 1){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Type de document</h2>';
+    html += '<div class="radio-group">';
+    Object.keys(LIV_DOC_LABELS).forEach(k => {
+      html += `<div class="radio-opt ${liv.docType===k?'selected':''}" onclick="pifApp.setLivDoc('${k}')"><div class="dot"></div><span>${LIV_DOC_LABELS[k]}</span></div>`;
+    });
+    html += '</div>';
+    if (liv.docType){
+      html += captureBoxHtml('liv-doc', liv.photos['liv-doc'], 'Photo de : ' + LIV_DOC_LABELS[liv.docType]);
+    }
+  } else if (liv.step === 2){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Pièce d\'identité</h2>';
+    html += captureBoxHtml('liv-identite', liv.photos['liv-identite'], "Photo de la pièce d'identité de la personne");
+  } else if (liv.step === 3){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Lieu de livraison</h2>';
+    html += captureBoxHtml('liv-lieu', liv.photos['liv-lieu'], 'Photo de l\'endroit de livraison');
+  } else if (liv.step === 4){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Récapitulatif</h2>';
+    html += `<div class="recap-item"><span class="k">Type</span><span class="v">${LIV_DOC_LABELS[liv.docType]}</span></div>`;
+    html += `<div class="recap-item"><span class="k">Gardien</span><span class="v">${esc(currentGuard)}</span></div>`;
+    html += `<div class="recap-item"><span class="k">Horodatage</span><span class="v mono">${formatNow()}</span></div>`;
+    html += '<div class="recap-photos">';
+    ['liv-doc','liv-identite','liv-lieu'].forEach(k => { if (liv.photos[k]) html += `<img src="${liv.photos[k]}">`; });
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+  renderLivFooter();
+}
+
+function captureBoxHtml(target, photo, label){
+  if (photo){
+    return `<div class="capture-box"><img src="${photo}"><button class="btn btn-outline btn-sm" onclick="pifApp.openCamera('${target}')">Reprendre la photo</button></div>`;
+  }
+  return `<div class="capture-box">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.8"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/><circle cx="12" cy="14" r="3.5"/></svg>
+    <div class="hint">${label}</div>
+    <button class="btn btn-primary btn-sm" onclick="pifApp.openCamera('${target}')">Prendre la photo</button>
+  </div>`;
+}
+
+function setLivDoc(k){ liv.docType = k; renderLivStep(); }
+
+function livCanProceed(){
+  if (liv.step === 1) return !!liv.docType && !!liv.photos['liv-doc'];
+  if (liv.step === 2) return !!liv.photos['liv-identite'];
+  if (liv.step === 3) return !!liv.photos['liv-lieu'];
+  return true;
+}
+
+function renderLivFooter(){
+  const old = document.querySelector('#screen-livraison .footer-bar');
+  if (old) old.remove();
+  const bar = document.createElement('div');
+  bar.className = 'footer-bar';
+  if (liv.step > 1){
+    bar.innerHTML += `<button class="btn btn-ghost" style="flex:0 0 90px;" onclick="pifApp.livBack()">Retour</button>`;
+  }
+  if (liv.step < 4){
+    bar.innerHTML += `<button class="btn btn-primary" ${livCanProceed()?'':'disabled'} onclick="pifApp.livNext()">Continuer</button>`;
+  } else {
+    bar.innerHTML += `<button class="btn btn-primary" onclick="pifApp.submitLivraison()">Valider la livraison</button>`;
+  }
+  $('screen-livraison').appendChild(bar);
+}
+
+function livNext(){ if (livCanProceed()) { liv.step++; renderLivStep(); } }
+function livBack(){ liv.step--; renderLivStep(); }
+
+async function submitLivraison(){
+  const id = 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const ts = new Date().toISOString();
+  const detail = { id, type:'LIVRAISON', guard: currentGuard, ts, docType: liv.docType, photos: liv.photos };
+  await sSet('event:' + id, JSON.stringify(detail), true);
+  const summary = { id, type:'LIVRAISON', guard: currentGuard, ts, extra: LIV_DOC_LABELS[liv.docType] };
+  await pushIndex(summary);
+  showConfirm('Livraison enregistrée', LIV_DOC_LABELS[liv.docType], ts);
+}
+
+// ---------- PIF wizard ----------
+function startPIF(){
+  pif = { step: 1, platePhoto:null, plate:'', ocrRunning:false, controls:{}, idPhoto:null };
+  showScreen('screen-pif');
+  renderPifStep();
+}
+
+function renderPifProgress(total){
+  const el = $('pif-progress'); el.innerHTML = '';
+  for (let i=1;i<=total;i++){
+    const d = document.createElement('i');
+    if (i <= pif.step) d.classList.add('done');
+    el.appendChild(d);
+  }
+  $('pif-step-label').textContent = 'Étape ' + pif.step + ' sur ' + total;
+}
+
+function pifControlCount(){ return Object.values(pif.controls).filter(Boolean).length; }
+
+function renderPifStep(){
+  const total = 4;
+  renderPifProgress(total);
+  const body = $('pif-body');
+  let html = '';
+
+  if (pif.step === 1){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Plaque d\'immatriculation</h2>';
+    html += captureBoxHtml('pif-plate', pif.platePhoto, "Photo de la plaque d'immatriculation");
+    if (pif.platePhoto){
+      html += '<div class="field" style="margin-top:16px;"><label>Immatriculation détectée (modifiable)</label>';
+      html += `<input class="plate-input" id="pif-plate-input" value="${esc(pif.plate)}" oninput="pifApp.setPlate(this.value)" placeholder="AA-000-AA"></div>`;
+      if (pif.ocrRunning){
+        html += '<div class="ocr-status"><span class="spinner"></span> Analyse OCR en cours…</div>';
+      }
+    }
+  } else if (pif.step === 2){
+    html += `<h2 class="display" style="font-size:17px; margin:0 0 6px;">Points de contrôle</h2>`;
+    html += `<p style="font-size:12.5px; color:var(--text-muted); margin:0 0 14px;">Cochez au minimum 3 des 5 points contrôlés.</p>`;
+    html += '<div class="check-list">';
+    CONTROL_POINTS.forEach((label, i) => {
+      const on = !!pif.controls[i];
+      html += `<div class="check-opt ${on?'selected':''}" onclick="pifApp.toggleControl(${i})"><div class="box">${on?'<svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#0f1319\" stroke-width=\"3\"><path d=\"M20 6L9 17l-5-5\"/></svg>':''}</div><span>${label}</span></div>`;
+    });
+    html += '</div>';
+    const c = pifControlCount();
+    html += `<div class="check-counter ${c>=3?'ok':''}">${c} / 5 sélectionné(s) — minimum 3</div>`;
+  } else if (pif.step === 3){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Pièce d\'identité / badge</h2>';
+    html += captureBoxHtml('pif-id', pif.idPhoto, "Photo de la pièce d'identité ou du badge");
+  } else if (pif.step === 4){
+    html += '<h2 class="display" style="font-size:17px; margin:0 0 14px;">Récapitulatif</h2>';
+    html += `<div class="recap-item"><span class="k">Immatriculation</span><span class="v mono">${esc(pif.plate)||'—'}</span></div>`;
+    html += `<div class="recap-item"><span class="k">Points contrôlés</span><span class="v">${pifControlCount()} / 5</span></div>`;
+    html += `<div class="recap-item"><span class="k">Gardien</span><span class="v">${esc(currentGuard)}</span></div>`;
+    html += `<div class="recap-item"><span class="k">Horodatage</span><span class="v mono">${formatNow()}</span></div>`;
+    html += '<div class="recap-photos">';
+    if (pif.platePhoto) html += `<img src="${pif.platePhoto}">`;
+    if (pif.idPhoto) html += `<img src="${pif.idPhoto}">`;
+    html += '</div>';
+  }
+
+  body.innerHTML = html;
+  renderPifFooter();
+}
+
+function setPlate(v){ pif.plate = v.toUpperCase(); }
+function toggleControl(i){ pif.controls[i] = !pif.controls[i]; renderPifStep(); }
+
+function pifCanProceed(){
+  if (pif.step === 1) return !!pif.platePhoto && !!pif.plate && !pif.ocrRunning;
+  if (pif.step === 2) return pifControlCount() >= 3;
+  if (pif.step === 3) return !!pif.idPhoto;
+  return true;
+}
+
+function renderPifFooter(){
+  const old = document.querySelector('#screen-pif .footer-bar');
+  if (old) old.remove();
+  const bar = document.createElement('div');
+  bar.className = 'footer-bar';
+  if (pif.step > 1){
+    bar.innerHTML += `<button class="btn btn-ghost" style="flex:0 0 90px;" onclick="pifApp.pifBack()">Retour</button>`;
+  }
+  if (pif.step < 4){
+    bar.innerHTML += `<button class="btn btn-primary" ${pifCanProceed()?'':'disabled'} onclick="pifApp.pifNext()">Continuer</button>`;
+  } else {
+    bar.innerHTML += `<button class="btn btn-primary" onclick="pifApp.submitPIF()">Valider le contrôle</button>`;
+  }
+  $('screen-pif').appendChild(bar);
+}
+
+function pifNext(){ if (pifCanProceed()) { pif.step++; renderPifStep(); } }
+function pifBack(){ pif.step--; renderPifStep(); }
+
+async function submitPIF(){
+  const id = 'evt_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const ts = new Date().toISOString();
+  const checkedLabels = CONTROL_POINTS.filter((_,i)=>pif.controls[i]);
+  const detail = { id, type:'PIF', guard: currentGuard, ts, plate: pif.plate, controls: checkedLabels, photos: { platePhoto: pif.platePhoto, idPhoto: pif.idPhoto } };
+  await sSet('event:' + id, JSON.stringify(detail), true);
+  const summary = { id, type:'PIF', guard: currentGuard, ts, extra: pif.plate };
+  await pushIndex(summary);
+  showConfirm('Contrôle PIF enregistré', pif.plate || '—', ts);
+}
+
+// ---------- shared: index + confirm ----------
+async function pushIndex(summary){
+  const raw = await sGet('events-index', true);
+  let idx = [];
+  try { idx = raw ? JSON.parse(raw) : []; } catch(e){ idx = []; }
+  idx.push(summary);
+  await sSet('events-index', JSON.stringify(idx), true);
+}
+
+function formatNow(){
+  return new Date().toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function formatTs(ts){
+  return new Date(ts).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+function showConfirm(title, sub, ts){
+  $('confirm-ticket').innerHTML = `
+    <div class="stamp">VALIDÉ</div>
+    <h3>${esc(title)}</h3>
+    <div class="ts mono">${formatTs(ts)}</div>
+    <div class="ticket-divider"></div>
+    <div style="font-size:14px; color:var(--text-muted);">${esc(sub)}</div>
+    <div style="font-size:12px; color:var(--text-muted); margin-top:10px;">Par ${esc(currentGuard)}</div>
+  `;
+  showScreen('screen-confirm');
+}
+
+// ---------- history ----------
+async function openHistory(){
+  showScreen('screen-history');
+  await renderHistory();
+}
+
+async function renderHistory(){
+  const list = $('hist-list');
+  list.innerHTML = '<div class="empty">Chargement…</div>';
+  const raw = await sGet('events-index', true);
+  let idx = [];
+  try { idx = raw ? JSON.parse(raw) : []; } catch(e){ idx = []; }
+  idx.sort((a,b) => new Date(b.ts) - new Date(a.ts));
+
+  const filter = $('hist-filter').value;
+  const now = new Date();
+  idx = idx.filter(e => {
+    const d = new Date(e.ts);
+    if (filter === 'today') return d.toDateString() === now.toDateString();
+    if (filter === '7d') return (now - d) <= 7*24*3600*1000;
+    return true;
+  });
+
+  if (!idx.length){ list.innerHTML = '<div class="empty">Aucun événement pour cette période.</div>'; return; }
+
+  list.innerHTML = '';
+  idx.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'hist-item';
+    row.innerHTML = `
+      <div class="hist-top">
+        <span class="badge ${e.type==='LIVRAISON'?'badge-blue':'badge-amber'}">${e.type}</span>
+        <span class="hist-meta mono">${formatTs(e.ts)}</span>
+      </div>
+      <div style="font-size:14px; font-weight:600;">${esc(e.extra||'')}</div>
+      <div class="hist-meta">${esc(e.guard)}</div>
+      <div class="hist-detail" style="display:none;"></div>
+    `;
+    row.addEventListener('click', async () => {
+      const detailEl = row.querySelector('.hist-detail');
+      const isOpen = detailEl.style.display !== 'none';
+      if (isOpen){ detailEl.style.display = 'none'; return; }
+      detailEl.style.display = 'block';
+      detailEl.innerHTML = 'Chargement du détail…';
+      if (!historyDetailCache[e.id]){
+        const raw2 = await sGet('event:' + e.id, true);
+        historyDetailCache[e.id] = raw2 ? JSON.parse(raw2) : null;
+      }
+      const d = historyDetailCache[e.id];
+      if (!d){ detailEl.innerHTML = 'Détail indisponible.'; return; }
+      let photos = Object.values(d.photos || {}).filter(Boolean);
+      let extra = '';
+      if (d.type === 'PIF'){ extra = `<div>Points contrôlés : ${d.controls.length} / 5</div>`; }
+      detailEl.innerHTML = extra + `<div class="hist-photos">${photos.map(p=>`<img src="${p}">`).join('')}</div>`;
+    });
+    list.appendChild(row);
+  });
+}
+
+// ---------- stats ----------
+async function openStats(){
+  showScreen('screen-stats');
+  const body = $('stats-body');
+  body.innerHTML = '<div class="empty">Chargement…</div>';
+  const raw = await sGet('events-index', true);
+  let idx = [];
+  try { idx = raw ? JSON.parse(raw) : []; } catch(e){ idx = []; }
+
+  const now = new Date();
+  const today = idx.filter(e => new Date(e.ts).toDateString() === now.toDateString());
+  const livCount = today.filter(e=>e.type==='LIVRAISON').length;
+  const pifCount = today.filter(e=>e.type==='PIF').length;
+
+  const byGuard = {};
+  today.forEach(e => {
+    byGuard[e.guard] = byGuard[e.guard] || { liv:0, pif:0 };
+    if (e.type==='LIVRAISON') byGuard[e.guard].liv++; else byGuard[e.guard].pif++;
+  });
+
+  let html = '<div class="stat-card"><div class="stat-row">';
+  html += `<div class="stat-num"><div class="n" style="color:var(--blue);">${livCount}</div><div class="l">Livraisons aujourd'hui</div></div>`;
+  html += `<div class="stat-num"><div class="n" style="color:var(--amber);">${pifCount}</div><div class="l">PIF aujourd'hui</div></div>`;
+  html += '</div>';
+
+  const guardNames = Object.keys(byGuard);
+  if (guardNames.length){
+    html += '<div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Répartition par gardien</div>';
+    guardNames.forEach(g => {
+      const { liv, pif } = byGuard[g];
+      const total = liv + pif || 1;
+      html += `<div class="guard-bar-row">
+        <div class="guard-bar-label"><span>${esc(g)}</span><span class="mono">${liv+pif}</span></div>
+        <div class="guard-bar"><div class="seg-l" style="width:${liv/total*100}%"></div><div class="seg-p" style="width:${pif/total*100}%"></div></div>
+      </div>`;
+    });
+  } else {
+    html += '<div class="empty">Aucun événement aujourd\'hui.</div>';
+  }
+  html += '</div>';
+
+  // 7-day trend
+  const days = [];
+  for (let i=6;i>=0;i--){
+    const d = new Date(now); d.setDate(now.getDate()-i);
+    days.push(d);
+  }
+  const counts = days.map(d => idx.filter(e => new Date(e.ts).toDateString() === d.toDateString()).length);
+  const max = Math.max(1, ...counts);
+  html += '<div class="stat-card"><div style="font-size:13px; color:var(--text-muted); margin-bottom:4px;">Activité — 7 derniers jours</div>';
+  html += '<div class="trend-chart">';
+  days.forEach((d,i) => {
+    const h = Math.max(4, counts[i]/max*100);
+    html += `<div class="trend-bar"><div class="bar" style="height:${h}%"></div><div class="lab">${d.toLocaleDateString('fr-FR',{weekday:'short'}).slice(0,3)}</div></div>`;
+  });
+  html += '</div></div>';
+
+  body.innerHTML = html;
+}
+
+// ---------- admin: login ----------
+let adminLoggedIn = false;
+let adminTab = 'agents';
+
+function showAdminLogin(){
+  $('admin-pin-input').value = '';
+  $('admin-login-error').innerHTML = '';
+  showScreen('screen-admin-login');
+}
+function backToLoginFromAdmin(){ showScreen('screen-login'); }
+
+async function doAdminLogin(){
+  const pin = $('admin-pin-input').value.trim();
+  $('admin-login-error').innerHTML = '';
+  if (!pin || pin.length < 4){
+    $('admin-login-error').innerHTML = '<div class="error-banner">Le code doit contenir au moins 4 caractères.</div>';
+    return;
+  }
+  const btn = $('btn-admin-login');
+  btn.disabled = true; btn.textContent = 'Vérification...';
+  try {
+    const stored = await sGet('admin-pin', true);
+    if (!stored){
+      await sSet('admin-pin', pin, true);
+      toast('Code administrateur défini pour ce poste.');
+    } else if (stored !== pin){
+      $('admin-login-error').innerHTML = '<div class="error-banner">Code administrateur incorrect.</div>';
+      btn.disabled = false; btn.textContent = 'Accéder';
+      return;
+    }
+    adminLoggedIn = true;
+    showScreen('screen-admin');
+    switchAdminTab('agents');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Accéder';
+  }
+}
+
+function adminLogout(){ adminLoggedIn = false; showScreen('screen-login'); }
+
+function switchAdminTab(tab){
+  adminTab = tab;
+  $('tab-agents').classList.toggle('active', tab === 'agents');
+  $('tab-export').classList.toggle('active', tab === 'export');
+  if (tab === 'agents') renderAdminAgents(); else renderAdminExport();
+}
+
+// ---------- admin: agents ----------
+async function getGuardsList(){
+  const raw = await sGet('guards-list', true);
+  try { return raw ? JSON.parse(raw) : []; } catch(e){ return []; }
+}
+async function saveGuardsList(list){ await sSet('guards-list', JSON.stringify(list), true); }
+
+async function renderAdminAgents(){
+  const body = $('admin-body');
+  body.innerHTML = '<div class="empty">Chargement…</div>';
+  const guards = await getGuardsList();
+
+  let html = '<div class="admin-add-card">';
+  html += '<div class="section-label">Ajouter un agent</div>';
+  html += '<div class="row">';
+  html += '<div class="field"><input id="new-agent-name" type="text" placeholder="Nom de l\'agent"></div>';
+  html += '<div class="field" style="max-width:110px;"><input id="new-agent-pin" type="tel" maxlength="4" placeholder="PIN"></div>';
+  html += '</div>';
+  html += '<button class="btn btn-primary btn-sm" style="width:100%;" onclick="pifApp.addAgentFromAdmin()">Ajouter</button>';
+  html += '</div>';
+
+  html += `<div class="section-label">${guards.length} agent(s) enregistré(s)</div>`;
+  if (!guards.length){
+    html += '<div class="empty">Aucun agent pour le moment.</div>';
+  } else {
+    guards.forEach(g => {
+      html += `<div class="agent-row" data-key="${esc(g.key)}">
+        <div class="info">
+          <div class="name">${esc(g.name)}</div>
+          <div class="pin" data-role="pin-display">PIN : •••</div>
+        </div>
+        <div class="actions">
+          <button class="icon-btn" title="Afficher / masquer le PIN" onclick="pifApp.togglePinVisibility('${esc(g.key)}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button class="icon-btn" title="Modifier le PIN" onclick="pifApp.editAgentPin('${esc(g.key)}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn danger" title="Supprimer l'agent" onclick="pifApp.deleteAgent('${esc(g.key)}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6"/></svg>
+          </button>
+        </div>
+      </div>`;
+    });
+  }
+  body.innerHTML = html;
+}
+
+async function addAgentFromAdmin(){
+  const name = $('new-agent-name').value.trim();
+  const pin = $('new-agent-pin').value.trim();
+  if (!name){ toast('Indiquez un nom pour l\'agent.', true); return; }
+  if (!/^\d{4}$/.test(pin)){ toast('Le PIN doit contenir 4 chiffres.', true); return; }
+  const guards = await getGuardsList();
+  const key = name.toLowerCase();
+  if (guards.find(g => g.key === key)){ toast('Un agent avec ce nom existe déjà.', true); return; }
+  guards.push({ key, name, pin });
+  await saveGuardsList(guards);
+  toast('Agent ajouté : ' + name);
+  renderAdminAgents();
+}
+
+function togglePinVisibility(key){
+  const row = document.querySelector(`.agent-row[data-key="${CSS.escape(key)}"]`);
+  if (!row) return;
+  getGuardsList().then(guards => {
+    const g = guards.find(x => x.key === key);
+    const el = row.querySelector('[data-role="pin-display"]');
+    if (!g || !el) return;
+    if (el.dataset.shown === '1'){ el.textContent = 'PIN : •••'; el.dataset.shown = '0'; }
+    else { el.textContent = 'PIN : ' + g.pin; el.dataset.shown = '1'; }
+  });
+}
+
+async function editAgentPin(key){
+  const guards = await getGuardsList();
+  const g = guards.find(x => x.key === key);
+  if (!g) return;
+  const newPin = prompt('Nouveau code PIN (4 chiffres) pour ' + g.name + ' :', g.pin);
+  if (newPin === null) return;
+  if (!/^\d{4}$/.test(newPin.trim())){ toast('Le PIN doit contenir 4 chiffres.', true); return; }
+  g.pin = newPin.trim();
+  await saveGuardsList(guards);
+  toast('Code PIN mis à jour pour ' + g.name);
+  renderAdminAgents();
+}
+
+async function deleteAgent(key){
+  const guards = await getGuardsList();
+  const g = guards.find(x => x.key === key);
+  if (!g) return;
+  if (!confirm('Supprimer l\'agent ' + g.name + ' ? Son historique d\'événements sera conservé mais il ne pourra plus se connecter.')) return;
+  const updated = guards.filter(x => x.key !== key);
+  await saveGuardsList(updated);
+  toast('Agent supprimé : ' + g.name);
+  renderAdminAgents();
+}
+
+// ---------- admin: export ----------
+function renderAdminExport(){
+  const body = $('admin-body');
+  body.innerHTML = `
+    <div class="admin-add-card">
+      <div class="section-label">Période à exporter</div>
+      <div class="field" style="margin-bottom:6px;">
+        <select id="export-range">
+          <option value="today">Aujourd'hui</option>
+          <option value="7d">7 derniers jours</option>
+          <option value="30d">30 derniers jours</option>
+          <option value="all" selected>Tout l'historique</option>
+        </select>
+      </div>
+    </div>
+    <div class="section-label">Formats disponibles</div>
+    <div class="export-btns">
+      <button class="btn btn-outline" onclick="pifApp.exportCSV()">Exporter en CSV (données, sans photos)</button>
+      <button class="btn btn-outline" onclick="pifApp.exportJSON()">Exporter en JSON complet (avec photos)</button>
+    </div>
+    <p class="notice" style="margin-top:20px;">Le CSV s'ouvre dans Excel / Google Sheets pour vos rapports. Le JSON complet inclut les photos encodées et sert de sauvegarde ou d'archive.</p>
+    <div id="export-status" style="margin-top:10px; font-size:12.5px; color:var(--text-muted);"></div>
+  `;
+}
+
+function filterByRange(idx, range){
+  const now = new Date();
+  return idx.filter(e => {
+    const d = new Date(e.ts);
+    if (range === 'today') return d.toDateString() === now.toDateString();
+    if (range === '7d') return (now - d) <= 7*24*3600*1000;
+    if (range === '30d') return (now - d) <= 30*24*3600*1000;
+    return true;
+  });
+}
+
+function csvEscape(v){
+  const s = String(v == null ? '' : v);
+  if (/[",\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+function downloadBlob(content, filename, mime){
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+async function exportCSV(){
+  const status = $('export-status');
+  status.textContent = 'Préparation du CSV…';
+  const raw = await sGet('events-index', true);
+  let idx = [];
+  try { idx = raw ? JSON.parse(raw) : []; } catch(e){ idx = []; }
+  const range = $('export-range').value;
+  idx = filterByRange(idx, range);
+  idx.sort((a,b) => new Date(a.ts) - new Date(b.ts));
+
+  const header = ['id','type','horodatage','agent','details'];
+  const rows = [header.join(';')];
+  idx.forEach(e => {
+    rows.push([e.id, e.type, e.ts, e.guard, e.extra || ''].map(csvEscape).join(';'));
+  });
+  const csv = '\uFEFF' + rows.join('\n');
+  downloadBlob(csv, 'export_pif_' + Date.now() + '.csv', 'text/csv;charset=utf-8');
+  status.textContent = idx.length + ' événement(s) exporté(s) en CSV.';
+}
+
+async function exportJSON(){
+  const status = $('export-status');
+  status.textContent = 'Préparation de l\'export complet…';
+  const raw = await sGet('events-index', true);
+  let idx = [];
+  try { idx = raw ? JSON.parse(raw) : []; } catch(e){ idx = []; }
+  const range = $('export-range').value;
+  idx = filterByRange(idx, range);
+
+  const details = [];
+  for (let i=0;i<idx.length;i++){
+    status.textContent = `Récupération ${i+1} / ${idx.length}…`;
+    const d = await sGet('event:' + idx[i].id, true);
+    if (d){ try { details.push(JSON.parse(d)); } catch(e){} }
+  }
+  downloadBlob(JSON.stringify(details, null, 2), 'export_complet_pif_' + Date.now() + '.json', 'application/json');
+  status.textContent = details.length + ' événement(s) exporté(s) en JSON (avec photos).';
+}
+
+// ---------- contrast / brightness toggle ----------
+function safeLocalGet(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }
+function safeLocalSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+
+function applyContrastTheme(mode){
+  const root = $('pif-root');
+  root.classList.toggle('theme-light', mode === 'light');
+  const icon = $('contrast-icon');
+  icon.innerHTML = mode === 'light'
+    ? '<path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"/>'
+    : '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+}
+
+function toggleContrast(){
+  const isLight = $('pif-root').classList.contains('theme-light');
+  const next = isLight ? 'dark' : 'light';
+  applyContrastTheme(next);
+  safeLocalSet('pif-contrast-theme', next);
+}
+
+(function initContrastTheme(){
+  const saved = safeLocalGet('pif-contrast-theme') || 'dark';
+  applyContrastTheme(saved);
+})();
+
+
+$('btn-login').addEventListener('click', doLogin);
+$('btn-logout').addEventListener('click', logout);
+$('login-pin').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+$('btn-admin-login').addEventListener('click', doAdminLogin);
+$('admin-pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') doAdminLogin(); });
+
+window.pifApp = {
+  openCamera, setLivDoc, livNext, livBack, submitLivraison,
+  setPlate, toggleControl, pifNext, pifBack, submitPIF,
+  goHome, startLivraison, startPIF, openHistory, renderHistory, openStats,
+  showAdminLogin, backToLoginFromAdmin, adminLogout, switchAdminTab,
+  addAgentFromAdmin, togglePinVisibility, editAgentPin, deleteAgent,
+  exportCSV, exportJSON, toggleContrast
+};
+
+})();
+</script>
